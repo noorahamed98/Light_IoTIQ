@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LIGHTHOUSE · IoT Platform</title>
+
+  <!-- MAIN STYLES -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- FontAwesome (icons) -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        integrity="sha512-xX2ANl3hNP3r6E3P8y0tY3q8F5u3dJ1iy9yNhkQjGthdEb8Am8oycqM68Qjcj6m5mJ9Vtp083Ic4kBK4ZKX2w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+<!-- ▀▀ AUTH ▀▀ -->
+<div id="authSection" class="auth-section">
+  <div class="auth-container">
+    <div class="auth-header">
+      <div class="lighthouse-logo"><i class="fas fa-lighthouse"></i><span>LIGHTHOUSE</span></div>
+    </div>
+
+    <div class="auth-tabs">
+      <button id="loginTab"    class="tab-button active" onclick="showLogin()">Login</button>
+      <button id="registerTab" class="tab-button"        onclick="showRegister()">Register</button>
+    </div>
+
+    <!-- login -->
+    <div id="loginForm" class="auth-form">
+      <h2>Secure Login</h2>
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group"><label>Email</label><input id="loginEmail" type="email" required /></div>
+        <div class="form-group"><label>Password</label><input id="loginPassword" type="password" required /></div>
+        <button class="btn primary" type="submit">Login</button>
+      </form>
+    </div>
+
+    <!-- register -->
+    <div id="registerForm" class="auth-form hidden">
+      <h2>Create Account</h2>
+      <form onsubmit="handleRegister(event)">
+        <div class="form-group"><label>Email</label><input id="registerEmail" type="email" required /></div>
+        <div class="form-group"><label>Password</label><input id="registerPassword" type="password" minlength="6" required /></div>
+        <div class="form-group"><label>Confirm Password</label><input id="confirmPassword" type="password" minlength="6" required /></div>
+        <button class="btn primary" type="submit">Register</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ▀▀ APP ▀▀ -->
+<div id="mainSection" class="main-section hidden">
+  <!-- sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <div class="lighthouse-logo"><i class="fas fa-lighthouse"></i><span>LIGHTHOUSE</span></div>
+    </div>
+
+    <div class="sidebar-menu">
+      <!-- Fleet Control -->
+      <div class="menu-item">
+        <div class="menu-header" onclick="toggleSubmenu('fleet-control')">
+          <i class="fas fa-broadcast-tower"></i><span>Fleet Control</span><i class="fas fa-chevron-right chevron"></i>
+        </div>
+        <div id="fleet-control" class="submenu">
+          <a onclick="showSection('device-manager')">Device Manager</a>
+          <a onclick="showSection('firmware-manager')">Firmware Manager</a>
+        </div>
+      </div>
+
+      <!-- Project Management -->
+      <div class="menu-item">
+        <div class="menu-header" onclick="showSection('project-management')">
+          <i class="fas fa-project-diagram"></i><span>Project Management</span>
+        </div>
+      </div>
+
+      <!-- Application Console -->
+      <div class="menu-item">
+        <div class="menu-header" onclick="showSection('application-console')">
+          <i class="fas fa-terminal"></i><span>Application Console</span>
+        </div>
+      </div>
+
+      <!-- Analytics -->
+      <div class="menu-item">
+        <div class="menu-header" onclick="showSection('analytics')">
+          <i class="fas fa-chart-line"></i><span>Analytics</span>
+        </div>
+      </div>
+
+      <!-- Admin Console -->
+      <div class="menu-item">
+        <div class="menu-header" onclick="toggleSubmenu('admin-console')">
+          <i class="fas fa-cogs"></i><span>Admin Console</span><i class="fas fa-chevron-right chevron"></i>
+        </div>
+        <div id="admin-console" class="submenu">
+          <a onclick="showSection('vendor-manager')">Vendor Manager</a>
+          <a onclick="showSection('parameter-manager')">Parameter Manager</a>
+          <a onclick="showSection('item-manager')">Item Manager</a>
+          <a onclick="showSection('item-type-manager')">Item Type Manager</a>
+          <a onclick="showSection('communication-policies')">Communication Policies</a>
+          <a onclick="showSection('messaging-policies')">Messaging Policies</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="menu-item"><div class="menu-header" onclick="showSection('search')"><i class="fas fa-search"></i><span>Search</span><span class="shortcut">⌘K</span></div></div>
+      <div class="menu-item"><div class="menu-header" onclick="showSection('settings')"><i class="fas fa-cog"></i><span>Settings</span></div></div>
+      <div class="menu-item"><div class="menu-header" onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></div></div>
+    </div>
+  </nav>
+
+  <!-- main content -->
+  <main class="main-content">
+    <!-- breadcrumb -->
+    <div class="breadcrumb">
+      <span>Account</span><i class="fas fa-chevron-right"></i>
+      <span>Fleet Control</span><i class="fas fa-chevron-right"></i>
+      <span>Devices</span>
+    </div>
+
+    <!-- DEVICE MANAGER -->
+    <section id="device-manager" class="content-section active">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-header"><div class="stat-icon online"></div><span>Online Devices</span></div><div class="stat-value"><span id="onlineDevicesCount" class="number">0</span></div></div>
+        <div class="stat-card"><div class="stat-header"><div class="stat-icon component"></div><span>Component Devices</span></div><div class="stat-value"><span id="componentDevicesCount" class="number">0</span></div></div>
+        <div class="stat-card"><div class="stat-header"><div class="stat-icon gateway"></div><span>Gateway Devices</span></div><div class="stat-value"><span id="gatewayDevicesCount" class="number">0</span></div></div>
+        <div class="stat-card"><div class="stat-header"><div class="stat-icon projects"></div><span>Unique Projects</span></div><div class="stat-value"><span id="uniqueProjectsCount" class="number">1</span></div></div>
+      </div>
+
+      <!-- actions -->
+      <div class="action-bar">
+        <div class="search-filters">
+          <div class="search-box"><i class="fas fa-search"></i><input id="deviceSearch" placeholder="Search devices…" /></div>
+          <button class="refresh-btn" onclick="loadDevices()"><i class="fas fa-sync-alt"></i></button>
+        </div>
+        <button class="btn primary create-btn" onclick="openCreateDeviceModal()"><i class="fas fa-plus"></i>Create Device</button>
+      </div>
+
+      <!-- table -->
+      <div class="data-table">
+        <table id="devicesTable">
+          <thead><tr><th>Serial Number</th><th>Connection</th><th>Provision</th><th>Created</th><th>Updated</th><th>QR</th><th></th></tr></thead>
+          <tbody id="devicesTableBody"><tr><td colspan="7" style="text-align:center;padding:40px">Loading…</td></tr></tbody>
+        </table>
+        <div class="table-pagination">
+          <div class="pagination-info">Rows per page
+            <select id="rowsPerPage"><option>20</option><option>50</option><option>100</option></select>
+          </div>
+          <div class="pagination-controls" id="pageInfo">Page 1 of 1
+            <button class="page-btn" disabled><i class="fas fa-angle-double-left"></i></button>
+            <button class="page-btn" disabled><i class="fas fa-angle-left"></i></button>
+            <button class="page-btn" disabled><i class="fas fa-angle-right"></i></button>
+            <button class="page-btn" disabled><i class="fas fa-angle-double-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ▀▀ 7 MODALS ▀▀ -->
+<!-- 1 ▸ Create Device -->
+<div id="createDeviceModal" class="modal-overlay">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <div class="modal-nav"><button class="nav-back"><i class="fas fa-chevron-left"></i></button><span class="modal-title">Create Device</span></div>
+      <button class="close-btn" onclick="closeModal('createDeviceModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-content">
+      <div class="form-container">
+        <h2>Create New Device</h2><p class="form-description">Enter the details for the new device</p>
+        <form id="deviceCreationForm" onsubmit="handleDeviceCreation(event)">
+          <div class="form-group"><label>Device Name <span class="required">*</span></label><input id="deviceName" required /></div>
+          <div class="form-group"><label>Foreign ID</label><input id="foreignId" /></div>
+          <div class="form-group"><label>Gateway Foreign ID</label><input id="gatewayForeignId" /></div>
+          <div class="form-group"><label>Serial Number <span class="required">*</span></label><input id="serialNumber" required /></div>
+          <div class="form-group">
+            <label>Image</label>
+            <div class="file-upload-area" onclick="document.getElementById('deviceImgInput').click()">
+              <input id="deviceImgInput" hidden type="file" accept="image/*" onchange="handleImageUpload(this)" />
+              <div class="upload-content"><div class="upload-icon"><i class="fas fa-image"></i></div><div class="upload-text"><p>Drop image or <span class="browse-link">browse</span></p><span class="upload-info">PNG · JPG · WEBP ≤ 10 MB</span></div></div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn secondary" onclick="closeModal('createDeviceModal')">Cancel</button><button form="deviceCreationForm" type="submit" class="btn primary"><i class="fas fa-plus"></i>Create Device</button></div>
+  </div>
+</div>
+
+<!-- 2 ▸ Create Vendor -->
+<div id="createVendorModal" class="modal-overlay">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <div class="modal-nav"><button class="nav-back"><i class="fas fa-chevron-left"></i></button><span class="modal-title">Create Vendor</span></div>
+      <button class="close-btn" onclick="closeModal('createVendorModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-content">
+      <div class="form-container">
+        <h2>Create New Vendor</h2><p class="form-description">Enter the details for the new vendor</p>
+        <form id="vendorCreationForm" onsubmit="handleVendorCreation(event)">
+          <div class="form-group"><label>Vendor Name <span class="required">*</span></label><input id="vendorName" required /></div>
+          <div class="form-group"><label>Description</label><textarea id="vendorDescription" rows="4"></textarea></div>
+          <div class="form-group">
+            <label>Industry <span class="required">*</span></label>
+            <select id="vendorIndustry" required>
+              <option value="">Select an industry</option><option>Manufacturing</option><option>Agriculture</option><option>Healthcare</option><option>Smart City</option><option>Energy</option><option>Transportation</option><option>Retail</option><option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Logo</label>
+            <div class="file-upload-area" onclick="document.getElementById('vendorImgInput').click()">
+              <input id="vendorImgInput" hidden type="file" accept="image/*" onchange="handleImageUpload(this)" />
+              <div class="upload-content"><div class="upload-icon"><i class="fas fa-upload"></i></div><div class="upload-text"><p>Drop logo or <span class="browse-link">browse</span></p><span class="upload-info">PNG · JPG · WEBP ≤ 10 MB</span></div></div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn secondary" onclick="closeModal('createVendorModal')">Cancel</button><button form="vendorCreationForm" type="submit" class="btn primary"><i class="fas fa-plus"></i>Create Vendor</button></div>
+  </div>
+</div>
+
+<!-- 3 ▸ Create Item Type -->
+<div id="createItemTypeModal" class="modal-overlay">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <div class="modal-nav"><button class="nav-back"><i class="fas fa-chevron-left"></i></button><span class="modal-title">Create Item Type</span></div>
+      <button class="close-btn" onclick="closeModal('createItemTypeModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-content">
+      <div class="form-container">
+        <h2>Create New Item Type</h2><p class="form-description">Enter the details for the new item type</p>
+        <form id="itemTypeCreationForm" onsubmit="handleItemTypeCreation(event)">
+          <div class="form-group"><label>Item Type Name <span class="required">*</span></label><input id="itemTypeName" required /></div>
+          <div class="form-group"><label>Description</label><textarea id="itemTypeDescription" rows="4"></textarea></div>
+          <div class="form-group">
+            <label>Image</label>
+            <div class="file-upload-area" onclick="document.getElementById('itemTypeImgInput').click()">
+              <input id="itemTypeImgInput" hidden type="file" accept="image/*" onchange="handleImageUpload(this)" />
+              <div class="upload-content"><div class="upload-icon"><i class="fas fa-upload"></i></div><div class="upload-text"><p>Drop image or <span class="browse-link">browse</span></p><span class="upload-info">PNG · JPG · WEBP ≤ 5 MB</span></div></div>
+            </div>
+          </div>
+          <div class="form-group"><label>Synonyms</label><div class="tag-input"><input id="synonyms" placeholder="Add synonym and press Enter" /><div id="synonymsList" class="tags-list"></div></div></div>
+          <div class="form-group"><label>Vendors <span class="required">*</span></label><select id="itemTypeVendors" multiple required></select></div>
+        </form>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn secondary" onclick="closeModal('createItemTypeModal')">Cancel</button><button form="itemTypeCreationForm" type="submit" class="btn primary"><i class="fas fa-plus"></i>Create Item Type</button></div>
+  </div>
+</div>
+
+<!-- 4 ▸ Create Item -->
+<div id="createItemModal" class="modal-overlay">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <div class="modal-nav"><button class="nav-back"><i class="fas fa-chevron-left"></i></button><span class="modal-title">Create Item</span></div>
+      <button class="close-btn" onclick="closeModal('createItemModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-content">
+      <div class="form-container">
+        <h2>Create New Item</h2><p class="form-description">Enter the details for the new item</p>
+        <form id="itemCreationForm" onsubmit="handleItemCreation(event)">
+          <div class="form-group"><label>Name <span class="required">*</span></label><input id="itemName" required /></div>
+          <div class="form-group"><label>Item Code <span class="required">*</span></label><input id="itemCode" required /></div>
+          <div class="form-group"><label>Description</label><textarea id="itemDescription" rows="4"></textarea></div>
+          <div class="form-group"><label>Metadata</label><div class="metadata-editor"><div class="metadata-row"><span class="line-number">1</span><textarea class="metadata-input">{}</textarea></div></div></div>
+          <div class="form-group"><label>Item Polling Config</label><input id="itemPollingConfig" placeholder="e.g. every 30 sec" /></div>
+        </form>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn secondary" onclick="closeModal('createItemModal')">Cancel</button><button form="itemCreationForm" type="submit" class="btn primary"><i class="fas fa-plus"></i>Create Item</button></div>
+  </div>
+</div>
+
+<!-- 5 ▸ Create Communication Policy -->
+<div id="createCommunicationPolicyModal" class="modal-overlay">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <div class="modal-nav"><button class="nav-back"><i class="fas fa-chevron-left"></i></button><span class="modal-title">Create Communication Policy</span></div>
+      <button class="close-btn" onclick="closeModal('createCommunicationPolicyModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-content">
+      <div class="form-container">
+        <h2>Create New Communication Policy</h2><p class="form-description">Enter the details for the new communication policy</p>
+        <form id="communicationPolicyCreationForm" onsubmit="handleCommunicationPolicyCreation(event)">
+          <div class="form-group"><label>Policy Name <span class="required">*</span></label><input id="commPolicyName" required /></div>
+          <div class="form-group">
+            <label>Icon</label>
+            <div class="file-upload-area" onclick="document.getElementById('commPolicyIconInput').click()">
+              <input id="commPolicyIconInput" hidden type="file" accept="image/*" onchange="handleImageUpload(this)" />
+              <div class="upload-content"><div class="upload-icon"><i class="fas fa-upload"></i></div><div class="upload-text"><p>Drop icon or <span class="browse-link">browse</span></p><span class="upload-info">PNG · JPG · WEBP ≤ 3 MB</span></div></div>
+            </div>
+          </div>
+          <div class="form-group"><label>Group Name <span class="required">*</span></label><input id="groupName" placeholder="Unique across cluster" required /></div>
+          <div class="form-group">
+            <label>Firmware Controlled</label>
+            <div class="toggle-group"><span>Need us to provide firmware?</span><label class="toggle-switch"><input id="firmwareControlled" type="checkbox" /><span class="toggle-slider"></span></label></div>
+          </div>
+          <div class="form-group"><label>Item Type <span class="required">*</span></label><select id="commItemType" required><option value="">Select Item Type…</option><option>Sensor</option><option>Actuator</option><option>Gateway</option><option>Controller</option></select></div>
+        </form>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn secondary" onclick="closeModal('createCommunicationPolicyModal')">Cancel</button><button form="communicationPolicyCreationForm" type="submit" class="btn primary"><i class="fas fa-plus"></i>Create Communication Policy</button></div>
+  </div>
+</div>
+
+<!-- 6 ▸ Create Messaging Policy -->
+<div id="createMessagingPolicyModal" class="modal-overlay">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <div class="modal-nav"><button class="nav-back"><i class="fas fa-chevron-left"></i></button><span class="modal-title">Create Messaging Policy</span></div>
+      <button class="close-btn" onclick="closeModal('createMessagingPolicyModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-content">
+      <div class="form-container">
+        <h2>Create New Messaging Policy</h2><p class="form-description">Enter the details for the new messaging policy</p>
+        <form id="messagingPolicyCreationForm" onsubmit="handleMessagingPolicyCreation(event)">
+          <div class="form-group"><label>Item Type <span class="required">*</span></label><select id="msgItemType" required><option value="">Select Item Type…</option><option>Sensor</option><option>Actuator</option><option>Gateway</option><option>Controller</option></select></div>
+          <div class="form-group"><label>Communication Policy <span class="required">*</span></label><select id="msgCommPolicy" required><option value="">Select an item type first…</option></select></div>
+        </form>
+      </div>
+    </div>
+    <div class="modal-footer"><button form="messagingPolicyCreationForm" type="submit" class="btn primary full-width">Create Messaging Policy</button></div>
+  </div>
+</div>
+
+<!-- 7 ▸ Create Parameter -->
+<div id="createParameterModal" class="modal-overlay">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <div class="modal-nav"><button class="nav-back"><i class="fas fa-chevron-left"></i></button><span class="modal-title">Create Parameter</span></div>
+      <button class="close-btn" onclick="closeModal('createParameterModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-content">
+      <div class="form-container">
+        <h2>Create New Parameter</h2><p class="form-description">Define a telemetry/command parameter for devices</p>
+        <form id="parameterCreationForm" onsubmit="handleParameterCreation(event)">
+          <div class="form-group"><label>Parameter Name <span class="required">*</span></label><input id="paramName" required /></div>
+          <div class="form-group"><label>Data Type <span class="required">*</span></label><select id="paramType" required><option value="">Select type…</option><option>boolean</option><option>integer</option><option>float</option><option>string</option><option>json</option><option>binary</option></select></div>
+          <div class="form-group"><label>MQTT Topic</label><input id="paramTopic" placeholder="devices/{thingName}/telemetry/temperature" /></div>
+          <div class="form-group"><label>Unit</label><input id="paramUnit" placeholder="°C, %, kPa…" /></div>
+          <div class="form-group"><label>Description</label><textarea id="paramDescription" rows="3"></textarea></div>
+        </form>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn secondary" onclick="closeModal('createParameterModal')">Cancel</button><button form="parameterCreationForm" type="submit" class="btn primary"><i class="fas fa-plus"></i>Create Parameter</button></div>
+  </div>
+</div>
+
+<!-- ▀▀ TOAST ▀▀ -->
+<div id="toast" class="toast"></div>
+
+<!-- MAIN JS -->
+<script src="script.js"></script>
+</body>
+</html>
+
